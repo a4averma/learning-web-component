@@ -1,6 +1,9 @@
 import { LitElement, html, css } from "lit";
 import { customElement, property, query } from "lit/decorators.js";
 
+import "./components/app-header";
+import "./components/app-footer";
+
 type ToDoItem = {
   text: string;
   completed: boolean;
@@ -67,7 +70,7 @@ class MyElement extends LitElement {
     `;
     const todosOrMessage = items.length > 0 ? todos : caughtUpMessage;
     return html`
-      <h2>To Do</h2>
+      <app-header></app-header>
       ${todosOrMessage}
       <input id="newitem" aria-label="New item" />
       <button @click=${this.addToDo}>Add</button>
@@ -80,6 +83,7 @@ class MyElement extends LitElement {
         />
         Hide completed
       </label>
+      <app-footer></app-footer>
     `;
   }
 }
