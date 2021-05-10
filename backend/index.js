@@ -3,15 +3,11 @@ import bodyParser from "body-parser";
 import mongoose from 'mongoose';
 import Task from './api/todo/models'
 import todoRoutes from './api/todo/routes'
+import cors from 'cors'
 const app = express(), port = process.env.PORT || 4000;
 
 mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://localhost/tododb', {useNewUrlParser: true, useUnifiedTopology: true});
-
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
-
-todoRoutes(app);
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
@@ -19,6 +15,13 @@ app.use((req, res, next) => {
     res.header('Access-Control-Allow-Headers', 'Content-Type');
   next();
 });
+app.options('*', cors());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+todoRoutes(app);
+
+
 
 app.use(function(req, res) {
   res.status(404).send({ url: req.originalUrl + ' not found' })

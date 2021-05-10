@@ -16,19 +16,14 @@ const axiosInstance = axios.create({
 
 type ToDoItem = {
   text: string;
+  _id: string;
   completed: boolean;
 };
 
 @customElement("my-element")
 class MyElement extends LitElement {
-  constructor() {
-    super();
-  }
   @property({ attribute: false })
-  listItems = [
-    { text: "Start Lit tutorial", completed: true },
-    { text: "Make to-do list", completed: false },
-  ];
+  listItems = [];
 
   @property()
   loading = false;
@@ -36,9 +31,14 @@ class MyElement extends LitElement {
   @property()
   error = false;
 
+  async firstUpdated() {
+    // Give the browser a chance to paint
+    await new Promise(() => this.getData());
+  }
+
   getData() {
-    axiosInstance
-      .get(`/tasks`)
+    return axiosInstance
+      .get(`/tasks/`)
       .then((r) => {
         this.listItems = r.data;
         this.loading = false;
@@ -65,17 +65,35 @@ class MyElement extends LitElement {
   input!: HTMLInputElement;
 
   addToDo() {
-    this.listItems.push({ text: this.input.value, completed: false });
-    this.requestUpdate();
-    this.input.value = "";
+    axiosInstance
+      .post(`/tasks`, { text: this.input.value })
+      .then((r) => {
+        this.listItems.push({ text: this.input.value, completed: false });
+        this.requestUpdate();
+        this.input.value = "";
+      })
+      .catch(() => {
+        this.requestUpdate();
+        this.input.value = "Error";
+      });
   }
 
   @property()
   hideCompleted = false;
 
-  toggleCompleted(item: ToDoItem) {
-    item.completed = !item.completed;
-    this.requestUpdate();
+  toggleCompleted(item: ToDoItem, index) {
+    axiosInstance
+      .put(`/task/${item._id}`, {
+        ...item,
+        completed: (item.completed = !item.completed),
+      })
+      .then((r) => {
+        this.listItems[index].completed = !item.completed;
+        this.requestUpdate();
+      })
+      .catch(() => {
+        alert("Error");
+      });
   }
 
   setHideCompleted(e: Event) {
@@ -90,10 +108,10 @@ class MyElement extends LitElement {
     const todos = html`
       <ul>
         ${items.map(
-          (item) =>
+          (item, index) =>
             html` <li
               class=${`cursor-pointer ${item.completed ? "completed" : ""}`}
-              @click=${() => this.toggleCompleted(item)}
+              @click=${() => this.toggleCompleted(item, index)}
             >
               ${item.text}
             </li>`
@@ -111,7 +129,6 @@ class MyElement extends LitElement {
       <app-header></app-header>
       ${todosOrMessage}
       <input id="newitem" required aria-label="New item" />
-      <button @click=${this.getData}>FETCH</button>
       <button @click=${this.addToDo}>Add</button>
       <br />
       <label>
