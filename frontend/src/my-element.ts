@@ -10,10 +10,9 @@ const axiosInstance = axios.create({
   headers: {
     post: {
       "Content-Type": "application/json",
-    }
+    },
   },
 });
-
 
 type ToDoItem = {
   text: string;
@@ -31,10 +30,23 @@ class MyElement extends LitElement {
     { text: "Make to-do list", completed: false },
   ];
 
+  @property()
+  loading = false;
+
+  @property()
+  error = false;
+
   getData() {
-      axiosInstance.get(`/tasks`).then(r => {
+    axiosInstance
+      .get(`/tasks`)
+      .then((r) => {
         this.listItems = r.data;
+        this.loading = false;
       })
+      .catch(() => {
+        this.error = true;
+        this.loading = false;
+      });
   }
 
   static get styles() {
@@ -89,10 +101,16 @@ class MyElement extends LitElement {
       </ul>
     `;
     const todosOrMessage = items.length > 0 ? todos : caughtUpMessage;
+    if (this.loading) {
+      return html` <p>Loading...</p> `;
+    }
+    if (this.error) {
+      return html` <p>Jokes on you</p> `;
+    }
     return html`
       <app-header></app-header>
       ${todosOrMessage}
-      <input id="newitem" aria-label="New item" />
+      <input id="newitem" required aria-label="New item" />
       <button @click=${this.getData}>FETCH</button>
       <button @click=${this.addToDo}>Add</button>
       <br />
