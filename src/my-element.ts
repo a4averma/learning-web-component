@@ -16,6 +16,9 @@ class MyElement extends LitElement {
 
   static get styles() {
     return css`
+      .cursor-pointer {
+        cursor: pointer;
+      }
       .completed {
         text-decoration-line: line-through;
         color: #777;
@@ -54,7 +57,7 @@ class MyElement extends LitElement {
         ${items.map(
           (item) =>
             html` <li
-              class=${item.completed ? "completed" : ""}
+              class=${`cursor-pointer ${item.completed ? "completed" : ""}`}
               @click=${() => this.toggleCompleted(item)}
             >
               ${item.text}
@@ -65,7 +68,7 @@ class MyElement extends LitElement {
     const todosOrMessage = items.length > 0 ? todos : caughtUpMessage;
     return html`
       <h2>To Do</h2>
-      {todosOrMessage}
+      ${todosOrMessage}
       <input id="newitem" aria-label="New item" />
       <button @click=${this.addToDo}>Add</button>
       <br />
