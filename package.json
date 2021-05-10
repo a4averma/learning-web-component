@@ -1,0 +1,24 @@
+{
+  "name": "sc-component",
+  "version": "0.0.0",
+  "main": "dist/my-vite-element.es.js",
+  "exports": {
+    ".": "./dist/my-vite-element.es.js"
+  },
+  "types": "types/my-element.d.ts",
+  "files": [
+    "dist",
+    "types"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build"
+  },
+  "dependencies": {
+    "lit": "^2.0.0-rc.2"
+  },
+  "devDependencies": {
+    "typescript": "^4.1.3",
+    "vite": "^2.2.3"
+  }
+}
